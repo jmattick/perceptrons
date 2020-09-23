@@ -72,12 +72,13 @@ for i in range(size+1):
 
 
 # plot values for first two features
-plt.scatter(values[0][0:int(group_size)], values[1][0:int(group_size)], color='red', label='group 0')
-plt.scatter(values[0][int(group_size+1):], values[1][int(group_size+1):], color='blue', label='group 1')
-plt.legend(loc='upper left')
-plt.xlabel('value_1')
-plt.ylabel('value_2')
-plt.savefig(outname + '.png')  # save as png with basename as outname
+if n_features > 1:
+    plt.scatter(values[0][0:int(group_size)], values[1][0:int(group_size)], color='red', label='group 0')
+    plt.scatter(values[0][int(group_size+1):], values[1][int(group_size+1):], color='blue', label='group 1')
+    plt.legend(loc='upper left')
+    plt.xlabel('value_1')
+    plt.ylabel('value_2')
+    plt.savefig(outname + '.png')  # save as png with basename as outname
 
 
 # output to file
