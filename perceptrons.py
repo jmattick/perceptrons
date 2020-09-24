@@ -1,61 +1,67 @@
-# Perceptrons
+import sys, getopt
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 
-### Create synthetic dataset
+# get arguments
+args = sys.argv[1:]
 
-Use the `create_linearly_sep_dataset.py` script to create 
-a synthetic dataset. By default, a linearly separated dataset 
-containing two groups will be output to a `dataset.txt` file.
-Values of the two groups consist of integers between 1 and 100.
-For linearly separated datasets, a random threshold is created
-and the values (x1) for the first group will be 1 <= x1 < threshold.
-The values (x2) for the second group wil be threshold <= x2 <= 100.
-For non-linearly separated datasets, the values of both groups will 
-be an integer between 1 and 100 inclusively. To ensure that the two 
-groups are non-linearly separated, at least one of the random integers 
-is inserted into both groups. The group assignments and values are
-output to a tab-delimited file. A plot of the first two dimensions
-is saved if the number of dimensions is greater than one.
+# set parameters
+train_file = ''
+test_file = ''
+output = ''
 
-Parameters:
+try:
+    opts, args = getopt.getopt(args, "ht:i:o:", ["train=", "test=", "output="])
+except getopt.GetoptError:
+    print('perceptrons.py -i <inputfile> -o <outputfile>')
+    sys.exit(2)
+for opt, arg in opts:
+    if opt == '-h':
+        print('test.py -i <inputfile> -o <outputfile>')
+        sys.exit()
+    elif opt in ("-t", "--train"):
+        train_file = arg
+    elif opt in ("-i", "--test"):
+        test_file = arg
+    elif opt in ("-o", "--output"):
+        output_file = arg
 
-- `-s` or `--size`: set sample size of dataset'
 
-- `-o` or `--output`: set output file name
+class ConstantReduction:
+    """Reduces learning rate by dividing by a constant factor"""
 
-- `-l` or `--linearly_sep`: boolean to describe if dataset is 
-linearly separable.
+    def __init__(self, start=0.01, factor=2):
+        self.rate = start
+        self.factor = factor
 
-- `-f` or `--features`: set number of features
+    def get(self):
+        # update rate by dividing by factor
+        self.rate = self.rate / self.factor
+        return self.rate
 
-Example creating a two dimensional linearly separable dataset:
-```
-python create_linearly_sep_dataset.py -s 10 -o linear_sep_dataset.txt -f 2
-```
 
-Plot linearly separable dataset:
+class FibonacciReduction:
+    """Reduces learning rate by dividing the rate by increasing numbers
+    in the Fibonacci sequence"""
 
-![linear plot](linear_sep_dataset.txt.png)
+    def __init__(self, start=0.01):
+        self.a = 0
+        self.b = 1
+        self.rate = start
 
-Example creating a two dimensional non-linearly separable dataset:
-```
-python create_linearly_sep_dataset.py -s 10 -o non_linear_sep_dataset.txt -f 2 -l F
-```
+    def get(self):
+        # get next num in sequence
+        num = self.a + self.b
+        # update values
+        self.a = self.b
+        self.b = num
+        # update rate by dividing by fibonacci number
+        self.rate = self.rate / num
+        return self.rate
 
-Plot non-linearly separable dataset:
 
-![non-linear plot](non_linear_sep_dataset.txt.png)
-
-### Implement Perceptron
-
-A perceptron was implemented in `perceptrons.py`. Weights are originally set as 
-random values between 0 and 1. To predict values, the dot product of weights and 
-values are calculated then rounded to the nearest class (0 if less than 0.5, else 1). 
-The fit function updates the weights over a set number of iterations. The weights 
-are updated using the perceptron learning rule: 
-`dw = learning rate * (actual - predicted) * xi`. Additionally, a plot_results 
-function was implemented to plot the number of errors at each epoch. 
-
-```
 class Perceptron:
     """Perceptron implementation"""
 
@@ -110,21 +116,8 @@ class Perceptron:
         plt.xlabel("Epoch")
         plt.ylabel("Number of Updates")
         return plt
-```
 
-Additionally, the perceptron in Python Machine Learning (PML) Ch. 2 
-was tested. The textbook implementation was modified slightly. The 
-textbook implementation used data with -1 or 1 classes, so the 
-rounding in the predict class was changed for 0 or 1 
-classes. A plot_results function was added to facilitate data reporting.
-One difference between the implementation above and the textbook
-implementation is that the implementation above sets the initial
-weights to random values, where the random numbers are taken from 
-a normal distribution with a standard deviation of 0.01. The 
-textbook implementation also includes an extra value as the bias
-unit.
 
-```
 class PerceptronPML(object):
     """Perceptron classifier.
 
@@ -199,16 +192,11 @@ class PerceptronPML(object):
         plt.xlabel("Epoch")
         plt.ylabel("Number of Updates")
         return plt
-```
 
-### Test perceptron on synthetic datasets
 
-To test the implemented perceptrons, additional code was added
-to the `perceptrons.py` script to run both models on a given 
-dataset. The script will train and fit the data using each 
-implementation and save a plot of udates vs epochs for each one.
+dec_rate = ConstantReduction(factor=1.2)
+fib_rate = FibonacciReduction()
 
-```
 # read data using pandas
 train_data = pd.read_csv(train_file, sep='\t')
 
@@ -235,70 +223,3 @@ model2.fit(X_train, y_train)
 plt2 = model2.plot_results()
 plt2.title('Updates per Epoch (PML Perceptron)')
 plt2.savefig(str(output_file) + '_updates_per_epoch_pml_perceptron' + '.png')
-```
-
-The `perceptrons.py` script was run on both the linearly and non-linearly
-separable datasets generated above. 
-
-```
-python perceptrons.py -t linear_sep_dataset.txt -o synthetic_results\linear_sep_data
-python perceptrons.py -t non_linear_sep_dataset.txt -o synthetic_results\non_linear_sep_data
-```
-
-For the linearly separable dataset, both models converged (no more updates). 
-The PML implementation converged one epoch earlier as seen in the following plots. 
-
-![linear plot](synthetic_results/linear_sep_data_updates_per_epoch_perceptron.png)
-![PML linear plot](synthetic_results/linear_sep_data_updates_per_epoch_pml_perceptron.png)
-
-Both models were not able to converge using the non-linearly separable dataset. 
-
-![non-linear plot](synthetic_results/non_linear_sep_data_updates_per_epoch_perceptron.png)
-![PML non-linear plot](synthetic_results/non_linear_sep_data_updates_per_epoch_pml_perceptron.png)
-
-# Usage
-
-### Create synthetic dataset
-
-Use the `create_linearly_sep_dataset.py` script to create 
-a synthetic dataset. 
-
-Parameters:
-
-- `-s` or `--size`: set sample size of dataset'
-
-- `-o` or `--output`: set output file name
-
-- `-l` or `--linearly_sep`: boolean to describe if dataset is 
-linearly separable.
-
-- `-f` or `--features`: set number of features
-
-Example creating a two dimensional linearly separable dataset:
-
-```
-python create_linearly_sep_dataset.py -s 10 -o linear_sep_dataset.txt -f 2
-```
-
-Example creating a two dimensional non-linearly separable dataset:
-
-```
-python create_linearly_sep_dataset.py -s 10 -o non_linear_sep_dataset.txt -f 2 -l F
-```
-
-### Test Perceptron Implementation
-
-Use `perceptrons.py` to run two implementations of a perceptron on a given
-dataset.
-
-Parameters:
-
-- `-t` or `--train`: input training dataset
-
-- `-o` or `--output`: set output file base name
-
-Example:
-
-```
-python perceptrons.py -t linear_sep_dataset.txt -o synthetic_results\linear_sep_data
-```
