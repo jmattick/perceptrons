@@ -59,7 +59,7 @@ function was implemented to plot the number of errors at each epoch.
 class Perceptron:
     """Perceptron implementation"""
 
-    def __init__(self, rate=0.01, n=10, random_state=1, reduction=None):
+    def __init__(self, rate=0.01, n=50, random_state=1, reduction=None):
         self.rate = rate  # learning rate
         self.n = n  # number of iterations
         self.random_state = random_state  #set random state
@@ -69,7 +69,7 @@ class Perceptron:
         """Fit training data"""
         rand = np.random.RandomState(self.random_state)
         # initialize random weights
-        self.w = rand.uniform(low=0.0, high=1, size=X.shape[1])
+        self.w = rand.uniform(low=0.0, high=1, size=1+X.shape[1])
         # initialize array to hold # errors at each epoch
         self.err = []
         # loop through epochs
@@ -85,7 +85,8 @@ class Perceptron:
                 # calulate update using perceptron learning rule
                 u = self.rate * (y_true - self.predict(xi))
                 # update weights
-                self.w += (u * xi)
+                self.w[1:] += (u * xi)
+                self.w[0] += u
                 # add to errors if update is not 0
                 errors += int(u != 0.0)
             # append total number of errors in epoch to err
@@ -94,7 +95,7 @@ class Perceptron:
 
     def calculate_dot(self, X):
         """Calculates dot product of values and weights wTx"""
-        return np.dot(X, self.w)
+        return np.dot(X, self.w[1:]) + self.w[0]
 
     def predict(self, X):
         """Predict results based on the output of the dot product"""
@@ -109,6 +110,7 @@ class Perceptron:
         plt.plot([i + 1 for i in range(len(self.err))], self.err, 'b')
         plt.xlabel("Epoch")
         plt.ylabel("Number of Updates")
+        plt.ylim(bottom=0)
         return plt
 ```
 
@@ -120,9 +122,7 @@ classes. A plot_results function was added to facilitate data reporting.
 One difference between the implementation above and the textbook
 implementation is that the implementation above sets the initial
 weights to random values, where the random numbers are taken from 
-a normal distribution with a standard deviation of 0.01. The 
-textbook implementation also includes an extra value as the bias
-unit.
+a normal distribution with a standard deviation of 0.01. 
 
 ```
 class PerceptronPML(object):
@@ -198,15 +198,51 @@ class PerceptronPML(object):
         plt.plot([i + 1 for i in range(len(self.errors_))], self.errors_, 'b')
         plt.xlabel("Epoch")
         plt.ylabel("Number of Updates")
+        plt.ylim(bottom=0)
         return plt
 ```
+
+To visualize the decision boundaries, a function was added to plot
+the data with the model's decision boundary. This function is from 
+PML Chapter 2.
+
+```
+def plot_decision_regions(X, y, classifier, resolution=0.02):
+    """Function from Ch.2 of Python Machine Learning ISBN: 9781787125933"""
+    # setup marker generator and color map
+    markers = ('s', 'x', 'o', '^', 'v')
+    colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
+    cmap = ListedColormap(colors[:len(np.unique(y))])
+
+    # plot the decision surface
+    x1_min, x1_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    x2_min, x2_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, resolution),
+                           np.arange(x2_min, x2_max, resolution))
+    Z = classifier.predict(np.array([xx1.ravel(), xx2.ravel()]).T)
+    Z = Z.reshape(xx1.shape)
+    plt.contourf(xx1, xx2, Z, alpha=0.3, cmap=cmap)
+    plt.xlim(xx1.min(), xx1.max())
+    plt.ylim(xx2.min(), xx2.max())
+
+    # plot class samples
+    for idx, cl in enumerate(np.unique(y)):
+        plt.scatter(x=X[y == cl, 0],
+                    y=X[y == cl, 1],
+                    alpha=0.8,
+                    c=colors[idx],
+                    marker=markers[idx],
+                    label=cl,
+                    edgecolor='black')
+``` 
 
 ### Test perceptron on synthetic datasets
 
 To test the implemented perceptrons, additional code was added
 to the `perceptrons.py` script to run both models on a given 
 dataset. The script will train and fit the data using each 
-implementation and save a plot of udates vs epochs for each one.
+implementation and save a plot of updates vs epochs and the decision
+boundary for each one.
 
 ```
 # read data using pandas
@@ -221,20 +257,38 @@ X = train_data.iloc[:, [1, 2]].values
 # split data
 X_train, X_val, y_train, y_val = train_test_split(X, y, random_state=1)
 
-# set and train model (using learning rate 0.01)
-model = Perceptron()
+# set and train model (using learning rate 0.0001)
+model = Perceptron(rate=0.0001, n=125)
 model.fit(X_train, y_train)
 plt1 = model.plot_results()
 plt1.title('Updates per Epoch (Perceptron)')
 plt1.savefig(str(output_file) + '_updates_per_epoch_perceptron' + '.png')
 
+# plot decision boundary
+plt.close()
+plot_decision_regions(X_train, y_train, classifier=model)
+plt.xlabel("value_1")
+plt.ylabel("value_2")
+plt.legend(loc='upper left')
+plt.title("Decision Boundary (Perceptron)")
+plt.savefig(str(output_file) + '_boundary_perceptron' + '.png')
+
 # set and train model using PML implementation
-model2 = PerceptronPML(n_iter=10)
+model2 = PerceptronPML(eta=0.0001, n_iter=10)
 model2.fit(X_train, y_train)
 # plot errors vs epoch for PML implementation
 plt2 = model2.plot_results()
 plt2.title('Updates per Epoch (PML Perceptron)')
 plt2.savefig(str(output_file) + '_updates_per_epoch_pml_perceptron' + '.png')
+
+# plot decision boundary
+plt.close()
+plot_decision_regions(X_train, y_train, classifier=model2)
+plt.xlabel("value_1")
+plt.ylabel("value_2")
+plt.legend(loc='upper left')
+plt.title("Decision Boundary (PML Perceptron)")
+plt.savefig(str(output_file) + '_boundary_pml_perceptron' + '.png')
 ```
 
 The `perceptrons.py` script was run on both the linearly and non-linearly
@@ -251,10 +305,21 @@ The PML implementation converged one epoch earlier as seen in the following plot
 ![linear plot](synthetic_results/linear_sep_data_updates_per_epoch_perceptron.png)
 ![PML linear plot](synthetic_results/linear_sep_data_updates_per_epoch_pml_perceptron.png)
 
+The determined decision boundaries are shown in the following plots:
+
+![linear dec](synthetic_results/linear_sep_data_boundary_perceptron.png)
+![PML linear dec](synthetic_results/linear_sep_data_boundary_pml_perceptron.png)
+
 Both models were not able to converge using the non-linearly separable dataset. 
 
 ![non-linear plot](synthetic_results/non_linear_sep_data_updates_per_epoch_perceptron.png)
 ![PML non-linear plot](synthetic_results/non_linear_sep_data_updates_per_epoch_pml_perceptron.png)
+
+The models did not determine correct decision boundaries for the non-linearly separable
+datasets as shown in the following plots:
+
+![non linear dec](synthetic_results/non_linear_sep_data_boundary_perceptron.png)
+![PML non linear dec](synthetic_results/non_linear_sep_data_boundary_pml_perceptron.png)
 
 # Usage
 
