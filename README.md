@@ -55,7 +55,7 @@ are updated using the perceptron learning rule:
 `dw = learning rate * (actual - predicted) * xi`. Additionally, a plot_results 
 function was implemented to plot the number of errors at each epoch. 
 
-```
+```python
 class Perceptron:
     """Perceptron implementation"""
 
@@ -124,7 +124,7 @@ implementation is that the implementation above sets the initial
 weights to random values, where the random numbers are taken from 
 a normal distribution with a standard deviation of 0.01. 
 
-```
+```python
 class PerceptronPML(object):
     """Perceptron classifier.
 
@@ -206,7 +206,7 @@ To visualize the decision boundaries, a function was added to plot
 the data with the model's decision boundary. This function is from 
 PML Chapter 2.
 
-```
+```python
 def plot_decision_regions(X, y, classifier, resolution=0.02):
     """Function from Ch.2 of Python Machine Learning ISBN: 9781787125933"""
     # setup marker generator and color map
@@ -244,7 +244,7 @@ dataset. The script will train and fit the data using each
 implementation and save a plot of updates vs epochs and the decision
 boundary for each one.
 
-```
+```python
 # read data using pandas
 train_data = pd.read_csv(train_file, sep='\t')
 
