@@ -34,7 +34,7 @@ python create_linearly_sep_dataset.py -s 10 -o linear_sep_dataset.txt -f 2
 
 Plot linearly separable dataset:
 
-![linear plot](linear_sep_dataset.txt.png)
+![linear plot](synthetic_data/linear_sep_dataset.txt.png)
 
 Example creating a two dimensional non-linearly separable dataset:
 ```
@@ -43,7 +43,7 @@ python create_linearly_sep_dataset.py -s 10 -o non_linear_sep_dataset.txt -f 2 -
 
 Plot non-linearly separable dataset:
 
-![non-linear plot](non_linear_sep_dataset.txt.png)
+![non-linear plot](synthetic_data/non_linear_sep_dataset.txt.png)
 
 ### Implement Perceptron
 
