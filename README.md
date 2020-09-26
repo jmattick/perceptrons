@@ -114,7 +114,8 @@ class Perceptron:
         return plt
 ```
 
-Additionally, the perceptron in Python Machine Learning (PML) Ch. 2 
+Additionally, the perceptron in Python Machine Learning 
+[(PML)](https://github.com/rasbt/python-machine-learning-book/blob/master/code/ch02/ch02.ipynb) Ch. 2 
 was tested. The textbook implementation was modified slightly. The 
 textbook implementation used data with -1 or 1 classes, so the 
 rounding in the predict class was changed for 0 or 1 
