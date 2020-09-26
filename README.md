@@ -540,13 +540,13 @@ plt.close()
 The accuracy of prediction using the AdalineGD model peaked at a learning
 rate of 0.005. 
 
-![learning rates](titanic_results\titanic_learning_rate_tests.png)
+![learning rates](titanic_results/titanic_learning_rate_tests.png)
 
 Additionally the error at each epoch of the AdalineGD model was
 used to determine the optimal rate. At a rate of 0.005 the error 
 reduces at each epoch before leveling off. 
 
-![error epoch](titanic_results\titanic_error_per_epoch.png)
+![error epoch](titanic_results/titanic_error_per_epoch.png)
 
 To determine the most predictive features of the AdalineGD titanic
 model, the model was trained using all the features of interest with a learning
@@ -571,7 +571,7 @@ The features that had the greatest absolute weight was Sex, Age,
 and Class. These features likely have the largest impact on the 
 prediction.
 
-![weights](titanic_results\titanic_adaline_weights.png)
+![weights](titanic_results/titanic_adaline_weights.png)
 
 To confirm that these features had the largest impact on the predicted
 values, the AdalineGD model was trained using each feature individually. 
@@ -611,7 +611,7 @@ to predict survival was still higher. The individual accuracies in combination w
 weights shows that sex is the most predictive feature, but other features in combination
 with sex such as age or class also improve predictions.  
 
-![feature accuracy](titanic_results\titanic_feature_accuracy.png)
+![feature accuracy](titanic_results/titanic_feature_accuracy.png)
 
 Finally, the accuracy of predictions using the AdalineGD model on the titanic dataset were 
 compared to the heuristic model. 
@@ -635,7 +635,7 @@ Using the features 'Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare',and 'Embarke
 of 0.0005, the accuracy of the AdalineGD model was 0.76. The accuracy of the 
 heuristic that uses random weights was 0.32. 
 
-![heuristic](titanic_results\titanic_performance.png)
+![heuristic](titanic_results/titanic_performance.png)
 
 # Usage
 
