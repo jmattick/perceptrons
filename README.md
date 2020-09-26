@@ -675,6 +675,13 @@ heuristic that uses random weights was 0.32.
 
 # Usage
 
+### Install Dependencies 
+
+Install dependencies using provided environment file: 
+```
+conda env create -f environment.yml
+```
+
 ### Create synthetic dataset
 
 Use the `create_linearly_sep_dataset.py` script to create 
