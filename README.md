@@ -642,7 +642,7 @@ plt.savefig(str(output_file) + "_feature_accuracy.png")
 plt.close()
 ```
 
-The accuracy of predictions using sex as the only feature was heigher than 
+The accuracy of predictions using sex as the only feature was higher than 
 the accuracy of using any other feature alone. The accuracy of using all of the features
 to predict survival was still higher. The individual accuracies in combination with the 
 weights shows that sex is the most predictive feature, but other features in combination
