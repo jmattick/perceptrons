@@ -198,6 +198,28 @@ class PerceptronPML(object):
         return plt
 
 
+class Heuristic:
+    """Heuristic classifier implementation"""
+    def __init__(self, random_state=1):
+        self.random_state = random_state  # set random state
+
+    def fit(self, X, y):
+        """Fit training data"""
+        rand = np.random.RandomState(self.random_state)
+        # initialize random weights
+        self.w = rand.uniform(low=0.0, high=1, size=X.shape[1])
+        return self
+
+    def calculate_dot(self, X):
+        """Calculates dot product of values and weights wTx"""
+        return np.dot(X, self.w)
+
+    def predict(self, X):
+        """Predict results based on the output of the dot product"""
+        # return 1 if dot product is greater or equal to 0.5, else 0
+        return np.where(self.calculate_dot(X) >= 0.5, 1, 0)
+
+
 def plot_decision_regions(X, y, classifier, resolution=0.02):
     """Function from Ch.2 of Python Machine Learning ISBN: 9781787125933"""
     # setup marker generator and color map
@@ -274,3 +296,17 @@ plt.ylabel("value_2")
 plt.legend(loc='upper left')
 plt.title("Decision Boundary (PML Perceptron)")
 plt.savefig(str(output_file) + '_boundary_pml_perceptron' + '.png')
+
+# set and train model using heuristic
+model3 = Heuristic()
+model3.fit(X_train, y_train)
+
+# plot decision boundary
+plt.close()
+plot_decision_regions(X_train, y_train, classifier=model3)
+plt.xlabel("value_1")
+plt.ylabel("value_2")
+plt.legend(loc='upper left')
+plt.title("Decision Boundary (Heuristic)")
+plt.savefig(str(output_file) + '_boundary_heuristic' + '.png')
+

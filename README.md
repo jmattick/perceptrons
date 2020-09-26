@@ -202,6 +202,32 @@ class PerceptronPML(object):
         return plt
 ```
 
+A heuristic model was also implemented to use for testing. The weights for the 
+model are set randomly for predictions. 
+
+```python
+class Heuristic:
+    """Heuristic classifier implementation"""
+    def __init__(self, random_state=1):
+        self.random_state = random_state  # set random state
+
+    def fit(self, X, y):
+        """Fit training data"""
+        rand = np.random.RandomState(self.random_state)
+        # initialize random weights
+        self.w = rand.uniform(low=0.0, high=1, size=X.shape[1])
+        return self
+
+    def calculate_dot(self, X):
+        """Calculates dot product of values and weights wTx"""
+        return np.dot(X, self.w)
+
+    def predict(self, X):
+        """Predict results based on the output of the dot product"""
+        # return 1 if dot product is greater or equal to 0.5, else 0
+        return np.where(self.calculate_dot(X) >= 0.5, 1, 0)
+```
+
 To visualize the decision boundaries, a function was added to plot
 the data with the model's decision boundary. This function is from 
 PML Chapter 2.
@@ -321,6 +347,16 @@ datasets as shown in the following plots:
 ![non linear dec](synthetic_results/non_linear_sep_data_boundary_perceptron.png)
 ![PML non linear dec](synthetic_results/non_linear_sep_data_boundary_pml_perceptron.png)
 
+The heuristic model was unable to determine correct decision boundaries for both the
+linearly separable and non-linearly separable datasets. 
+
+Linearly separable dataset:
+
+![heuristic linear](synthetic_results/linear_sep_data_boundary_heuristic.png)
+
+Non-linearly separable dataset:
+![heuristic non-linear](synthetic_results/non_linear_sep_data_boundary_heuristic.png)
+
 ### Train Adaline Model using Titanic Dataset
 
 The dataset train.csv from https://www.kaggle.com/c/titanic was used to train an Adaline
@@ -434,7 +470,7 @@ X_train, X_val, y_train, y_val = train_test_split(X, y, random_state=1, train_si
 ```
 
 Any features that are not numerical needed to be encoded. Previous exploration
-of this dataset identified label encoding as a good method of encoding [1](https://github.com/jmattick/titanic-machine-learning).
+of this dataset identified label encoding as a good method of encoding [(1)](https://github.com/jmattick/titanic-machine-learning).
 The LabelEncoder from sklearn was used to encode non-numerical features.
 
 ```python
